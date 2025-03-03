@@ -4,6 +4,8 @@ from flightdelay.entity.config_entity import DataIngestionConfig
 from flightdelay.entity.artifact_entity import DataIngestionArtifact
 
 import os
+import certifi
+import ssl
 import sys
 import pandas as pd
 import pymongo
@@ -13,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from dotenv import load_dotenv
 load_dotenv()
 
+ca = certifi.where()
 MONGO_DB_URL=os.getenv("MONGO_DB_URL")
 
 class DataIngestion:
