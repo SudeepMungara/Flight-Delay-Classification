@@ -21,7 +21,7 @@ MODEL_FILE_NAME = "model.pkl"
 Columns to convert to categorical
 """
 CATEGORICAL_COLUMNS = ['MONTH', 'DAY_OF_WEEK','DAY_OF_MONTH','UNIQUE_CARRIER',
-            'NEW_ORIGIN', 'NEW_DEST', 'ORIGIN_CITY_TIME_ZONE', 'DEST_CITY_TIME_ZONE']
+       'NEW_ORIGIN', 'NEW_DEST', 'ORIGIN_CITY_TIME_ZONE', 'DEST_CITY_TIME_ZONE']
 
 """
 Columns to exclude from the feature set
@@ -63,3 +63,15 @@ DATA_TRANSFORMATION_TRANSFORMED_DATA_DIR: str = "transformed"
 DATA_TRANSFORMATION_TRANSFORMED_OBJECT_DIR: str = "transformed_object"
 DATA_TRANSFORMATION_TRAIN_FILE_PATH: str = "train.npy"
 DATA_TRANSFORMATION_TEST_FILE_PATH: str = "test.npy"
+
+"""
+Model Trainer related constant start with MODEL TRAINER VAR NAME
+"""
+
+MODEL_TRAINER_DIR_NAME: str = "model_trainer"
+MODEL_TRAINER_TRAINED_MODEL_DIR: str = "trained_model"
+MODEL_TRAINER_TRAINED_MODEL_NAME: str = "model.pkl"
+MODEL_TRAINER_EXPECTED_SCORE: float = 0.7
+MODEL_TRAINER_OVER_FIITING_UNDER_FITTING_THRESHOLD: float = 0.05
+
+TRAINING_BUCKET_NAME = "FlightDelay"
