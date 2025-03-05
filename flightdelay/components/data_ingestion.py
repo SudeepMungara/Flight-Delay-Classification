@@ -68,15 +68,40 @@ class DataIngestion:
             return series.apply(lambda x: x if counts[x] >= threshold else 'Other')
         except Exception as e:
             raise FlighDelayException(e,sys)
+    def get_outlier_datapoints(self,data,col_name):
+        """
+        Identifies outlier datapoints in a specified column of a DataFrame using the Interquartile Range (IQR) method.
+        """
+        Q1 = data[col_name].quantile(0.25)
+        Q3 = data[col_name].quantile(0.75)
+        IQR = Q3-Q1
+        lower_bound = Q1-1.5*IQR
+        upper_bound = Q3+1.5*IQR
+        lower_bound_outlier_datapoints = data[(data[col_name]<lower_bound)]
+        upper_bound_outlier_datapoints = data[(data[col_name]>upper_bound)]
+        return lower_bound_outlier_datapoints,upper_bound_outlier_datapoints, lower_bound, upper_bound
             
     def feature_engineering(self,dataframe: pd.DataFrame):
         try:
+
+            air_time_lower_outlier, air_time_upper_outlier, air_time_lower_bound, air_time_upper_bound = self.get_outlier_datapoints(dataframe,'AIR_TIME')
+            distance_lower_outlier, distance_upper_outlier, distance_lower_bound, distance_upper_bound = self.get_outlier_datapoints(dataframe,'DISTANCE')
+            set1 = set(air_time_upper_outlier.apply(tuple, axis=1))
+            set2 = set(distance_upper_outlier.apply(tuple, axis=1))
+            sym_diff = set1.symmetric_difference(set2)
+            df_diff = pd.DataFrame(list(sym_diff), columns=air_time_upper_outlier.columns)
+            # dropping non-overlapping outliers
+            df_main_tuples = dataframe.apply(tuple, axis=1)
+            df_outlier_tuples = set(df_diff.apply(tuple, axis=1))
+            # Keep only rows that are NOT in df_outlier
+            dataframe = dataframe[~df_main_tuples.isin(df_outlier_tuples)]
+            
             dataframe['EXPECTED_DURATION']=(dataframe['SCHD_ARR_TIME_UTC_MINUTES']-dataframe['DEP_TIME_UTC_MINUTES'])+1
             dataframe['ARR_DELAY_CLS'] = dataframe['ARR_DELAY_CLS'].map({'On-Time': 0, 'Delay': 1})
             dataframe['NEW_ORIGIN'] = self.group_rare_categories_series(dataframe['ORIGIN'], threshold=0.01)
             dataframe['NEW_DEST'] = self.group_rare_categories_series(dataframe['DEST'], threshold=0.01)
-            for col in self.data_ingestion_config.categorical_columns:
-                dataframe[col] = dataframe[col].astype('category')
+            # for col in self.data_ingestion_config.categorical_columns:
+            #     dataframe[col] = dataframe[col].astype('category')
             return dataframe
         except Exception as e:
             raise FlighDelayException(e,sys)

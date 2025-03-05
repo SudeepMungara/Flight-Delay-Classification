@@ -3,7 +3,8 @@ from flightdelay.components.data_validation import DataValidation
 from flightdelay.components.data_transformation import DataTransformation
 from flightdelay.logging.logger import logging
 from flightdelay.exception.exception import FlighDelayException
-from flightdelay.entity.config_entity import DataIngestionConfig,TrainingPipelineConfig,DataValidationConfig,DataTransformationConfig
+from flightdelay.entity.config_entity import DataIngestionConfig,TrainingPipelineConfig,DataValidationConfig,DataTransformationConfig,ModelTrainerConfig
+from flightdelay.components.model_trainer import ModelTrainer
 
 import sys
 
@@ -24,11 +25,16 @@ if __name__ == "__main__":
         logging.info("Data Validation Completed")
 
         data_transformation_config=DataTransformationConfig(training_pipeline_config)
-        logging.info("data Transformation started")
+        logging.info("Data Transformation started")
         data_transformation=DataTransformation(data_validation_artifact,data_transformation_config)
         data_transformation_artifact=data_transformation.initiate_data_transformation()
-        logging.info("data Transformation completed")
+        logging.info("Data Transformation completed")
 
-
+        logging.info("Model Training sstared")
+        model_trainer_config=ModelTrainerConfig(training_pipeline_config)
+        model_trainer=ModelTrainer(model_trainer_config=model_trainer_config,data_transformation_artifact=data_transformation_artifact)
+        model_trainer_artifact=model_trainer.initiate_model_trainer()
+        logging.info("Model Training artifact created")
+        
     except Exception as e:
         raise FlighDelayException(e,sys)

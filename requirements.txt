@@ -9,5 +9,8 @@ matplotlib
 seaborn
 pyyaml
 xgboost
+mlflow
+dagshub
+
 
 -e .
